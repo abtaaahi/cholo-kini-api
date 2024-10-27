@@ -1,27 +1,26 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
-const cors = require("cors"); 
+const cors = require("cors");
 dotenv.config();
 
 const app = express();
 
-const allowedOrigins = ["https://abtaaahi.github.io/cholo-kini"];
-
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-  }
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-
-  next();
-});
+const allowedOrigins = ["https://abtaaahi.github.io"];
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"],
+    optionsSuccessStatus: 200,
+  })
+);
 
 app.use(express.json());
 
@@ -31,12 +30,12 @@ app.post("/404/api/send-order-email", async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.EMAIL_USER, 
+      user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
   });
 
-  const orderSummary = cartItems.map(item => `${item.name} (x${item.quantity})`).join(", ");
+  const orderSummary = cartItems.map((item) => `${item.name} (x${item.quantity})`).join(", ");
   const message = `
     Order Confirmation
     Name: ${customerDetails.name}
