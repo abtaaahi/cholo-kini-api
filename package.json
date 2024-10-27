@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "A backend API for sending order confirmation emails.",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "nodemailer": "^6.9.15"

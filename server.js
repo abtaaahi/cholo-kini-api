@@ -1,9 +1,27 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
+const cors = require("cors"); 
 dotenv.config();
 
 const app = express();
+
+const allowedOrigins = ["https://abtaaahi.github.io/cholo-kini"];
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 app.use(express.json());
 
