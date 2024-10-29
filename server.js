@@ -2,9 +2,12 @@ const express = require("express");
 const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const pdfMakePrinter = require("pdfmake/src/printer");
+const pdfMake = require("pdfmake/build/pdfmake");
+const pdfFonts = require("pdfmake/build/vfs_fonts");
 const fs = require("fs");
 dotenv.config();
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs; // Set the VFS fonts
 
 const app = express();
 
@@ -37,7 +40,7 @@ app.post("/404/api/send-order-email", async (req, res) => {
   // Define the PDF document
   const docDefinition = {
     content: [
-      { text: 'Order Invoice', style: 'header' },
+      { text: 'Cholo Kini - Order Invoice', style: 'header' },
       {
         text: `Name: ${customerDetails.name}\nAddress: ${customerDetails.address}\nPhone: ${customerDetails.phone}\nEmail: ${customerDetails.email}`,
         margin: [0, 10, 0, 20],
@@ -75,14 +78,7 @@ app.post("/404/api/send-order-email", async (req, res) => {
   };
 
   // Generate PDF
-  const pdfDoc = new pdfMakePrinter({ 
-    Roboto: { 
-      normal: 'fonts/Roboto-Regular.ttf', 
-      bold: 'fonts/Roboto-Medium.ttf', 
-      italics: 'fonts/Roboto-Italic.ttf', 
-      bolditalics: 'fonts/Roboto-MediumItalic.ttf' 
-    } 
-  }).createPdf(docDefinition);
+  const pdfDoc = pdfMake.createPdf(docDefinition);
   
   const filePath = `./invoice_${Date.now()}.pdf`;
   pdfDoc.getBuffer(async (buffer) => {
@@ -101,7 +97,7 @@ app.post("/404/api/send-order-email", async (req, res) => {
       to: customerDetails.email,
       bcc: `${process.env.ADMIN_EMAIL_1}, ${process.env.ADMIN_EMAIL_2}`,
       subject: "Order Confirmation with Invoice",
-      text: `Dear ${customerDetails.name},\n\nThank you for your purchase! Here are your personal details:\n\nName: ${customerDetails.name}\nAddress: ${customerDetails.address}\nPhone: ${customerDetails.phone}\nEmail: ${customerDetails.email}\n\nHere is the summary of your order:\n\n${orderSummary}\n\nTotal Amount: $${totalAmount.toFixed(2)}\n\nWe will contact you soon. You will get your product in 2-3 working days.\n\nPlease find the attached invoice for your order.\n\nBest regards,\nYour Company`,
+      text: `Dear ${customerDetails.name},\nThank you for your purchase! Here are your personal details:\nName: ${customerDetails.name}\nAddress: ${customerDetails.address}\nPhone: ${customerDetails.phone}\nEmail: ${customerDetails.email}\nHere is the summary of your order:\n${orderSummary}\nTotal Amount: $${totalAmount.toFixed(2)}\nWe will contact you soon. You will get your product in 2-3 working days.\nPlease find the attached invoice for your order.\nBest regards,\nCholo Kini`,
       attachments: [
         {
           filename: `invoice_${Date.now()}.pdf`,
@@ -122,5 +118,5 @@ app.post("/404/api/send-order-email", async (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 4001;
+const PORT = process.env.PORT || 7001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
