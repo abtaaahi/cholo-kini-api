@@ -34,7 +34,7 @@ app.post("/404/api/send-order-email", async (req, res) => {
 
   // Create order summary for email
   const orderSummary = cartItems
-    .map(item => `Product: ${item.name}, Quantity: ${item.quantity}, Price: $${(item.price * item.quantity).toFixed(2)}`)
+    .map(item => `Product: ${item.name}, Quantity: ${item.quantity}, Price: BDT ${(item.price * item.quantity).toFixed(2)}`)
     .join("\n");
 
   // Define the PDF document
@@ -51,8 +51,8 @@ app.post("/404/api/send-order-email", async (req, res) => {
           widths: ['*', 'auto', 'auto'],
           body: [
             [{ text: 'Product Name', style: 'tableHeader' }, { text: 'Quantity', style: 'tableHeader' }, { text: 'Price', style: 'tableHeader' }],
-            ...cartItems.map(item => [item.name, item.quantity, `$${(item.price * item.quantity).toFixed(2)}`]),
-            [{ text: 'Total', colSpan: 2 }, {}, `$${totalAmount.toFixed(2)}`],
+            ...cartItems.map(item => [item.name, item.quantity, `BDT ${(item.price * item.quantity).toFixed(2)}`]),
+            [{ text: 'Total', colSpan: 2 }, {}, `BDT ${totalAmount.toFixed(2)}`],
           ],
         },
       },
@@ -97,7 +97,7 @@ app.post("/404/api/send-order-email", async (req, res) => {
       to: customerDetails.email,
       bcc: `${process.env.ADMIN_EMAIL_1}, ${process.env.ADMIN_EMAIL_2}`,
       subject: "Order Confirmation with Invoice",
-      text: `Dear ${customerDetails.name},\nThank you for your purchase! Here are your personal details:\nName: ${customerDetails.name}\nAddress: ${customerDetails.address}\nPhone: ${customerDetails.phone}\nEmail: ${customerDetails.email}\nHere is the summary of your order:\n${orderSummary}\nTotal Amount: $${totalAmount.toFixed(2)}\nWe will contact you soon. You will get your product in 2-3 working days.\nPlease find the attached invoice for your order.\nBest regards,\nCholo Kini`,
+      text: `Dear ${customerDetails.name},\nThank you for your purchase! Here are your personal details:\nName: ${customerDetails.name}\nAddress: ${customerDetails.address}\nPhone: ${customerDetails.phone}\nEmail: ${customerDetails.email}\nHere is the summary of your order:\n${orderSummary}\nTotal Amount: BDT ${totalAmount.toFixed(2)}\nWe will contact you soon. You will get your product in 2-3 working days.\nPlease find the attached invoice for your order.\nBest regards,\nCholo Kini`,
       attachments: [
         {
           filename: `invoice_${Date.now()}.pdf`,
@@ -118,5 +118,5 @@ app.post("/404/api/send-order-email", async (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 7001;
+const PORT = process.env.PORT || 7002;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
