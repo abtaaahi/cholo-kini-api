@@ -11,7 +11,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; // Set the VFS fonts
 
 const app = express();
 
-const allowedOrigins = ["https://abtaaahi.github.io"];
+const allowedOrigins = ["https://abtaaahi.github.io", "https://cholo.kini.sahossain.com", "https://cholo.kini.sahossain.com/cholo-kini"];
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -97,7 +97,7 @@ app.post("/404/api/send-order-email", async (req, res) => {
       to: customerDetails.email,
       bcc: `${process.env.ADMIN_EMAIL_1}, ${process.env.ADMIN_EMAIL_2}`,
       subject: "Order Confirmation with Invoice",
-      text: `Dear ${customerDetails.name},\nThank you for your purchase! Here are your personal details:\nName: ${customerDetails.name}\nAddress: ${customerDetails.address}\nPhone: ${customerDetails.phone}\nEmail: ${customerDetails.email}\nHere is the summary of your order:\n${orderSummary}\nTotal Amount: BDT ${totalAmount.toFixed(2)}\nWe will contact you soon. You will get your product in 2-3 working days.\nPlease find the attached invoice for your order.\nBest regards,\nCholo Kini`,
+      text: `Dear ${customerDetails.name},\n\nThank you for your purchase! Here are your personal details:\n\nName: ${customerDetails.name}\nAddress: ${customerDetails.address}\nPhone: ${customerDetails.phone}\nEmail: ${customerDetails.email}\n\nHere is the summary of your order:\n${orderSummary}\n\nTotal Amount: BDT ${totalAmount.toFixed(2)}\n\nWe will contact you soon. You will get your product in 2-3 working days.\nPlease find the attached invoice for your order.\nBest regards,\nCholo Kini`,
       attachments: [
         {
           filename: `invoice_${Date.now()}.pdf`,
@@ -116,6 +116,16 @@ app.post("/404/api/send-order-email", async (req, res) => {
       res.status(500).send("Error sending email.");
     }
   });
+});
+
+// Serve text or HTML when accessing the root path "/"
+app.get("/", (req, res) => {
+  res.send("Welcome to Cholo Kini! Please use the API endpoints for order-related actions.");
+});
+
+// Fallback route for undefined endpoints
+app.get("*", (req, res) => {
+  res.status(404).send("This route does not exist. Please refer to the documentation for available endpoints.");
 });
 
 const PORT = process.env.PORT || 7002;
